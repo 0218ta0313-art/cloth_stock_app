@@ -56,12 +56,6 @@ def ensure_users_table():
     conn.close()
 
 
-@app.before_first_request
-def init_app():
-    # 最初のリクエスト前に一度だけ実行される
-    ensure_users_table()
-
-
 # ==== ログイン必須デコレーター ====
 def login_required(view_func):
     @wraps(view_func)
@@ -74,7 +68,6 @@ def login_required(view_func):
     return wrapped
 
 
-# ==== ログイン ====
 # ==== ログイン ====
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -953,8 +946,6 @@ def add_movement():
     )
 
 
-
-
 # ==== カテゴリ編集 ====
 @app.route("/categories/<int:category_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -1045,6 +1036,12 @@ def delete_category(category_id):
 
     flash("カテゴリを削除しました。", "success")
     return redirect(url_for("category_list"))
+
+
+# ==== 起動後、最初のリクエスト時に一度だけユーザーテーブルを確認＆admin作成 ====
+@app.before_first_request
+def init_users_table():
+    ensure_users_table()
 
 
 if __name__ == "__main__":

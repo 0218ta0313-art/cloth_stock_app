@@ -33,10 +33,11 @@
 <body>
 
     <!-- ナビバー -->
-    {% if session.get("user_id") %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top border-bottom">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{{ url_for('item_list') }}">染め物やさん 在庫管理</a>
+            <a class="navbar-brand fw-bold" href="{{ url_for('item_list') }}">
+                染め物やさん 在庫管理
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#mainNavbar" aria-controls="mainNavbar"
@@ -46,7 +47,6 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('item_list') }}">商品一覧</a>
                     </li>
@@ -60,12 +60,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('add_category') }}">カテゴリ登録</a>
                     </li>
-
-                    {% if session.get("role") == "admin" %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('bulk_add_categories') }}">カテゴリ一括登録</a>
                     </li>
-                    {% endif %}
 
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('supplier_list') }}">仕入先一覧</a>
@@ -80,24 +77,31 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('add_movement') }}">在庫移動登録</a>
                     </li>
-
                 </ul>
 
-                <!-- ログイン中のユーザー名 ＋ ログアウト -->
-                <span class="navbar-text me-3">
-                    {{ session.username }} さん
-                    {% if session.get("role") == "admin" %}
-                        <span class="badge bg-danger">admin</span>
+                <!-- 右側：ログイン状態表示 -->
+                <div class="d-flex">
+                    {% if session.get("user_id") %}
+                        <span class="navbar-text me-2">
+                            {{ session.get("username") }} さん
+                            {% if session.get("role") == "admin" %}
+                                （管理者）
+                            {% else %}
+                                （スタッフ）
+                            {% endif %}
+                        </span>
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('logout') }}">
+                            ログアウト
+                        </a>
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('login') }}">
+                            ログイン
+                        </a>
                     {% endif %}
-                </span>
-
-                <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('logout') }}">
-                    ログアウト
-                </a>
+                </div>
             </div>
         </div>
     </nav>
-    {% endif %}
 
     <!-- コンテンツ -->
     <main class="container mt-3 mb-5">
