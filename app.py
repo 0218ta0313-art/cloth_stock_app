@@ -1038,11 +1038,8 @@ def delete_category(category_id):
     return redirect(url_for("category_list"))
 
 
-# ==== 起動後、最初のリクエスト時に一度だけユーザーテーブルを確認＆admin作成 ====
-@app.before_first_request
-def init_users_table():
-    ensure_users_table()
-
+# ==== アプリ起動時に一度だけユーザーテーブルを確認＆admin作成 ====
+ensure_users_table()
 
 if __name__ == "__main__":
     app.run(debug=True)
