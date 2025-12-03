@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}在庫移動登録 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">在庫移動登録</h2>
+    <a href="{{ url_for('movement_list') }}" class="btn btn-sm btn-outline-secondary">
+        一覧へ戻る
+    </a>
+</div>
+
+<form method="post" class="card p-3">
+    <div class="mb-3">
+        <label class="form-label">商品（必須）</label>
+        <select name="item_id" class="form-select">
+            <option value="">-- 選択してください --</option>
+            {% for item in items %}
+                <option value="{{ item['item_id'] }}"
+                    {% if form.get('item_id') == (item['item_id'] | string) %}selected{% endif %}>
+                    {{ item['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">移動種別（必須）</label>
+        <select name="movement_type" class="form-select">
+            <option value="">-- 選択してください --</option>
+            <option value="IN"  {% if form.get('movement_type') == 'IN' %}selected{% endif %}>入庫</option>
+            <option value="OUT" {% if form.get('movement_type') == 'OUT' %}selected{% endif %}>出庫</option>
+            <option value="ADJUST" {% if form.get('movement_type') == 'ADJUST' %}selected{% endif %}>調整</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">数量（必須／1以上の整数）</label>
+        <input type="number" name="quantity" min="1" step="1"
+               class="form-control"
+               value="{{ form.get('quantity', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">仕入先</label>
+        <select name="supplier_id" class="form-select">
+            <option value="">-- 未指定 --</option>
+            {% for s in suppliers %}
+                <option value="{{ s['supplier_id'] }}"
+                    {% if form.get('supplier_id') == (s['supplier_id'] | string) %}selected{% endif %}>
+                    {{ s['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">メモ</label>
+        <textarea name="memo" rows="3"
+                  class="form-control">{{ form.get('memo', '') }}</textarea>
+    </div>
+
+    <div class="mt-2">
+        <button type="submit" class="btn btn-primary">登録する</button>
+        <a href="{{ url_for('movement_list') }}" class="btn btn-outline-secondary">
+            キャンセル
+        </a>
+    </div>
+</form>
+{% endblock %}

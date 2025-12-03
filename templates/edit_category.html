@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}カテゴリ編集 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<h2>カテゴリ編集</h2>
+
+<form method="post">
+    <label>
+        カテゴリ名（必須）<br>
+        <input type="text" name="name" value="{{ form.get('name', '') }}">
+    </label>
+
+    <label>
+        説明<br>
+        <textarea name="description" rows="3">{{ form.get('description', '') }}</textarea>
+    </label>
+
+    <p>
+        <button type="submit">更新する</button>
+        <a href="{{ url_for('category_list') }}">キャンセル</a>
+    </p>
+</form>
+{% endblock %}

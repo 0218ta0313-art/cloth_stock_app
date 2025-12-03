@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}在庫移動一覧 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">在庫移動一覧</h2>
+    <a href="{{ url_for('add_movement') }}" class="btn btn-sm btn-primary">
+        ＋ 在庫移動を登録
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">ID</th>
+                <th scope="col">日時</th>
+                <th scope="col">商品</th>
+                <th scope="col">移動種別</th>
+                <th scope="col">数量</th>
+                <th scope="col">仕入先</th>
+                <th scope="col">メモ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in movements %}
+            <tr>
+                <!-- 見かけの連番 -->
+                <td>{{ loop.index }}</td>
+                <!-- 本物の ID -->
+                <td>{{ m["movement_id"] }}</td>
+                <td>{{ m["created_at"] }}</td>
+                <td>{{ m["item_name"] or "" }}</td>
+                <td>
+                    {% if m["movement_type"] == "IN" %}
+                        入庫
+                    {% elif m["movement_type"] == "OUT" %}
+                        出庫
+                    {% elif m["movement_type"] == "ADJUST" %}
+                        調整
+                    {% else %}
+                        {{ m["movement_type"] }}
+                    {% endif %}
+                </td>
+                <td>{{ m["quantity"] }}</td>
+                <td>{{ m["supplier_name"] or "" }}</td>
+                <td>{{ m["memo"] or "" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <!-- 列が 8 個なので colspan=8 -->
+                <td colspan="8" class="text-center text-muted">
+                    まだ在庫移動が登録されていません。
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

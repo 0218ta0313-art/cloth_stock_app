@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}商品編集 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<h2>商品編集</h2>
+
+<form method="post">
+    <label>
+        商品名（必須）<br>
+        <input type="text" name="name" value="{{ form.get('name', '') }}">
+    </label>
+
+    <label>
+        SKU（品番など）<br>
+        <input type="text" name="sku" value="{{ form.get('sku', '') }}">
+    </label>
+
+    <label>
+        カテゴリ<br>
+        <select name="category_id">
+            <option value="">-- 未選択 --</option>
+            {% for cat in categories %}
+                <option value="{{ cat['category_id'] }}"
+                    {% if form.get('category_id') == (cat['category_id'] | string) %}selected{% endif %}>
+                    {{ cat['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>
+        標準価格（数字）<br>
+        <input type="number" name="base_price" value="{{ form.get('base_price', '') }}">
+    </label>
+
+    <label>
+        サイズ<br>
+        <input type="text" name="size" value="{{ form.get('size', '') }}">
+    </label>
+
+    <label>
+        色<br>
+        <input type="text" name="color" value="{{ form.get('color', '') }}">
+    </label>
+
+    <label>
+        素材<br>
+        <input type="text" name="material" value="{{ form.get('material', '') }}">
+    </label>
+
+    <label>
+        メモ・備考<br>
+        <textarea name="note" rows="3">{{ form.get('note', '') }}</textarea>
+    </label>
+
+    <label>
+        <input type="checkbox" name="is_active" value="1"
+               {% if form.get('is_active', '1') == '1' %}checked{% endif %}>
+        有効（チェックを外すと「×」になります）
+    </label>
+
+    <p>
+        <button type="submit">更新する</button>
+        <a href="{{ url_for('item_list') }}">キャンセル</a>
+    </p>
+</form>
+{% endblock %}

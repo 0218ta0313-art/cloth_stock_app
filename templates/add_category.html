@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}カテゴリ登録 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">カテゴリ登録</h2>
+    <a href="{{ url_for('category_list') }}" class="btn btn-sm btn-outline-secondary">
+        一覧へ戻る
+    </a>
+</div>
+
+<form method="post" class="card p-3">
+    <div class="mb-3">
+        <label class="form-label">カテゴリ名（必須）</label>
+        <input type="text" name="name"
+               class="form-control"
+               value="{{ form.get('name', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">説明</label>
+        <textarea name="description" rows="3"
+                  class="form-control">{{ form.get('description', '') }}</textarea>
+    </div>
+
+    <div class="mt-2">
+        <button type="submit" class="btn btn-primary">登録する</button>
+        <a href="{{ url_for('category_list') }}" class="btn btn-outline-secondary">
+            キャンセル</a>
+    </div>
+</form>
+{% endblock %}
+

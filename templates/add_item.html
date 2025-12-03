@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}商品登録 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">商品登録</h2>
+    <a href="{{ url_for('item_list') }}" class="btn btn-sm btn-outline-secondary">
+        一覧へ戻る
+    </a>
+</div>
+
+<form method="post" class="card p-3">
+    <div class="mb-3">
+        <label class="form-label">商品名（必須）</label>
+        <input type="text" name="name"
+               class="form-control"
+               value="{{ form.get('name', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">SKU（品番など）</label>
+        <input type="text" name="sku"
+               class="form-control"
+               value="{{ form.get('sku', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">カテゴリ</label>
+        <select name="category_id" class="form-select">
+            <option value="">-- 未選択 --</option>
+            {% for cat in categories %}
+                <option value="{{ cat['category_id'] }}"
+                    {% if form.get('category_id') == (cat['category_id'] | string) %}selected{% endif %}>
+                    {{ cat['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">標準価格（数字）</label>
+        <input type="number" name="base_price"
+               class="form-control"
+               value="{{ form.get('base_price', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">サイズ</label>
+        <input type="text" name="size"
+               class="form-control"
+               value="{{ form.get('size', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">色</label>
+        <input type="text" name="color"
+               class="form-control"
+               value="{{ form.get('color', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">素材</label>
+        <input type="text" name="material"
+               class="form-control"
+               value="{{ form.get('material', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">メモ・備考</label>
+        <textarea name="note" rows="3"
+                  class="form-control">{{ form.get('note', '') }}</textarea>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="is_active"
+               name="is_active" value="1"
+               {% if form.get('is_active', '1') == '1' %}checked{% endif %}>
+        <label class="form-check-label" for="is_active">
+            有効（チェックを外すと「×」になります）
+        </label>
+    </div>
+
+    <div class="mt-2">
+        <button type="submit" class="btn btn-primary">登録する</button>
+        <a href="{{ url_for('item_list') }}" class="btn btn-outline-secondary">
+            キャンセル
+        </a>
+    </div>
+</form>
+{% endblock %}
+
