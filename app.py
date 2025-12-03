@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sqlite3
 from datetime import datetime
 from functools import wraps
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
+
 
 # ==== 設定 ====
 DB_NAME = "cloth_stock.db"   # DBファイル名
@@ -19,6 +20,46 @@ def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row  # 行を dict 風に扱えるようにする
     return conn
+
+def ensure_users_table():
+    """USERS テーブルと admin ユーザーを保証する"""
+    conn = get_db_connection()
+
+    # USERS テーブルが無ければ作る
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS USERS (
+            user_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            username      TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at    TEXT NOT NULL,
+            role          TEXT
+        );
+        """
+    )
+
+    # admin ユーザーが 1 件もなければ作る（パスワード: testpass）
+    row = conn.execute(
+        "SELECT COUNT(*) AS cnt FROM USERS WHERE username = 'admin'"
+    ).fetchone()
+
+    if row["cnt"] == 0:
+        conn.execute(
+            """
+            INSERT INTO USERS (username, password_hash, created_at, role)
+            VALUES (?, ?, datetime('now','localtime'), ?)
+            """,
+            ("admin", generate_password_hash("testpass"), "admin"),
+        )
+
+    conn.commit()
+    conn.close()
+
+
+@app.before_first_request
+def init_app():
+    # 最初のリクエスト前に一度だけ実行される
+    ensure_users_table()
 
 
 # ==== ログイン必須デコレーター ====
