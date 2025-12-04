@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>{% block title %}在庫管理アプリ{% endblock %}</title>
 
+    <!-- ★ スマホ表示用（超重要） -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- Bootstrap 5 CSS（CDN） -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -15,6 +18,11 @@
     <style>
         body {
             padding-top: 60px;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
         }
 
         .low-stock-row {
@@ -25,8 +33,36 @@
             font-weight: bold;
         }
 
-        textarea {
-            width: 100%;
+        /* メインコンテンツの最大幅（PC時） */
+        main.container {
+            max-width: 1100px;
+        }
+
+        /* ★ スマホ用調整 */
+        @media (max-width: 576px) {
+            body {
+                padding-top: 56px;
+                font-size: 13px;
+            }
+
+            main.container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .navbar-brand {
+                font-size: 0.9rem;
+                white-space: normal;  /* タイトル長いとき折り返しOK */
+            }
+
+            .nav-link {
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
