@@ -56,6 +56,76 @@ def ensure_users_table():
     conn.close()
 
 
+def ensure_base_tables():
+    """在庫管理で使う基本テーブル（ITEMS/CATEGORIES/SUPPLIERS/STOCK_MOVEMENTS）を作成"""
+    conn = get_db_connection()
+
+    # カテゴリ
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS CATEGORIES (
+            category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name        TEXT NOT NULL,
+            description TEXT,
+            created_at  TEXT NOT NULL
+        );
+        """
+    )
+
+    # 商品
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ITEMS (
+            item_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+            name        TEXT NOT NULL,
+            sku         TEXT,
+            category_id INTEGER,
+            base_price  INTEGER,
+            size        TEXT,
+            color       TEXT,
+            material    TEXT,
+            note        TEXT,
+            created_at  TEXT NOT NULL,
+            updated_at  TEXT NOT NULL,
+            is_active   INTEGER NOT NULL DEFAULT 1
+        );
+        """
+    )
+
+    # 仕入先
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS SUPPLIERS (
+            supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name        TEXT NOT NULL,
+            phone       TEXT,
+            email       TEXT,
+            address     TEXT,
+            note        TEXT,
+            created_at  TEXT NOT NULL
+        );
+        """
+    )
+
+    # 在庫移動
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS STOCK_MOVEMENTS (
+            movement_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+            item_id       INTEGER NOT NULL,
+            movement_type TEXT    NOT NULL,
+            quantity      INTEGER NOT NULL,
+            supplier_id   INTEGER,
+            memo          TEXT,
+            created_at    TEXT NOT NULL
+        );
+        """
+    )
+
+    conn.commit()
+    conn.close()
+
+
 # ==== ログイン必須デコレーター ====
 def login_required(view_func):
     @wraps(view_func)
@@ -1037,8 +1107,8 @@ def delete_category(category_id):
     flash("カテゴリを削除しました。", "success")
     return redirect(url_for("category_list"))
 
-
-# ==== アプリ起動時に一度だけユーザーテーブルを確認＆admin作成 ====
+# ==== アプリ起動時に一度だけテーブル作成＆admin作成 ====
+ensure_base_tables()
 ensure_users_table()
 
 if __name__ == "__main__":
