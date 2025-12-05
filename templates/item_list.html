@@ -1,7 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}商品一覧 - 在庫管理アプリ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">商品一覧</h2>
+    <a href="{{ url_for('add_item') }}" class="btn btn-sm btn-primary">
+        ＋ 新しい商品を登録
+    </a>
+</div>
+
+<form method="get" action="{{ url_for('item_list') }}" class="row g-2 align-items-center mb-3">
+    <div class="col-auto">
+        <label for="categoryFilter" class="col-form-label">カテゴリで絞り込み：</label>
+    </div>
+    <div class="col-auto">
+        <select id="categoryFilter" name="category_id"
+                class="form-select form-select-sm"
+                onchange="this.form.submit()">
+            <option value="">すべて</option>
+            {% for cat in categories %}
+                <option value="{{ cat.category_id }}"
+                    {% if selected_category_id == cat.category_id %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <noscript>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-sm btn-outline-secondary">絞り込む</button>
+        </div>
+    </noscript>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">ID</th>
+                <th scope="col">商品名</th>
+                <th scope="col">SKU</th>
+                <th scope="col">カテゴリ</th>
+                <th scope="col">標準価格</th>
+                <th scope="col">サイズ</th>
+                <th scope="col">色</th>
+                <th scope="col">素材</th>
+                <th scope="col">有効</th>
+                <th scope="col">在庫数</th>
+                <th scope="col">操作</th>
+            </tr>
+        </thead>
+
         <tbody>
         {% for item in items %}
 
-            <tr class="{% if item.stock_quantity is not none and item.stock_quantity <= low_stock_threshold %}low-stock-row{% endif %}">
+            {% set is_low_stock =
+                (item.stock_quantity is not none)
+                and (item.stock_quantity <= low_stock_threshold)
+            %}
+
+            <tr class="{% if is_low_stock %}low-stock-row{% endif %}">
                 <!-- No. -->
                 <td>{{ loop.index }}</td>
                 <!-- ID -->
@@ -20,8 +80,8 @@
                 <td>{{ "○" if item.is_active == 1 else "×" }}</td>
 
                 <!-- 在庫数（アラート付き） -->
-                <td class="{% if item.stock_quantity is not none and item.stock_quantity <= low_stock_threshold %}low-stock-cell{% endif %}">
-                    {% if item.stock_quantity is not none and item.stock_quantity <= low_stock_threshold %}⚠ {% endif %}
+                <td class="{% if is_low_stock %}low-stock-cell{% endif %}">
+                    {% if is_low_stock %}⚠ {% endif %}
                     {{ item.stock_quantity }}
                 </td>
 
@@ -56,3 +116,6 @@
             </tr>
         {% endfor %}
         </tbody>
+    </table>
+</div>
+{% endblock %}
