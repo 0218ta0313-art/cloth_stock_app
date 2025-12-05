@@ -1015,6 +1015,72 @@ def add_movement():
         form={},
     )
 
+# ==== 在庫クイック更新（商品一覧からの入出庫） ====
+@app.route("/movements/quick", methods=["POST"])
+@login_required
+def quick_movement():
+    conn = get_db_connection()
+
+    item_id = request.form.get("item_id") or None
+    movement_type = request.form.get("movement_type", "").strip()
+    quantity = request.form.get("quantity") or None
+    memo = request.form.get("memo", "").strip() or None
+
+    errors = []
+
+    # 必須チェック
+    if not item_id:
+        errors.append("商品IDが不正です。")
+
+    if not movement_type:
+        errors.append("移動種別は必須です。")
+
+    qty_int = None
+    if quantity:
+        try:
+            qty_int = int(quantity)
+            if qty_int <= 0:
+                errors.append("数量は1以上の整数で入力してください。")
+        except ValueError:
+            errors.append("数量は整数で入力してください。")
+    else:
+        errors.append("数量は必須です。")
+
+    if movement_type not in ("IN", "OUT", "ADJUST"):
+        errors.append("移動種別が不正です。")
+
+    # item_id 整数変換
+    item_id_int = None
+    if item_id:
+        try:
+            item_id_int = int(item_id)
+        except ValueError:
+            errors.append("商品IDが不正です。")
+
+    if errors:
+        for e in errors:
+            flash(e, "error")
+        conn.close()
+        return redirect(url_for("item_list"))
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # 仕入先はとりあえず None（必要ならフォームに追加も可）
+    conn.execute(
+        """
+        INSERT INTO STOCK_MOVEMENTS
+            (item_id, movement_type, quantity, supplier_id, memo, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (item_id_int, movement_type, qty_int, None, memo or None, now),
+    )
+    conn.commit()
+    conn.close()
+
+    flash("在庫を更新しました。", "success")
+    return redirect(url_for("item_list"))
+
+
 
 # ==== カテゴリ編集 ====
 @app.route("/categories/<int:category_id>/edit", methods=["GET", "POST"])

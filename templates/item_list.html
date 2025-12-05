@@ -1,112 +1,56 @@
-{% extends "base.html" %}
+<!-- 操作 -->
+<td>
+    <!-- 上段：既存のボタン（履歴・編集・削除） -->
+    <div class="btn-group mb-1" role="group">
+        <a href="{{ url_for('item_history', item_id=item['item_id']) }}"
+           class="btn btn-sm btn-outline-info">
+            履歴
+        </a>
+        <a href="{{ url_for('edit_item', item_id=item['item_id']) }}"
+           class="btn btn-sm btn-outline-secondary">
+            編集
+        </a>
 
-{% block title %}商品一覧 - 在庫管理アプリ{% endblock %}
-
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4 mb-0">商品一覧</h2>
-    <a href="{{ url_for('add_item') }}" class="btn btn-sm btn-primary">
-        ＋ 新しい商品を登録
-    </a>
-</div>
-
-<form method="get" action="{{ url_for('item_list') }}" class="row g-2 align-items-center mb-3">
-    <div class="col-auto">
-        <label for="categoryFilter" class="col-form-label">カテゴリで絞り込み：</label>
+        {% if session.get('role') == 'admin' %}
+        <form action="{{ url_for('delete_item', item_id=item['item_id']) }}"
+              method="post"
+              class="d-inline"
+              onsubmit="return confirm('本当に削除しますか？');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                削除
+            </button>
+        </form>
+        {% endif %}
     </div>
-    <div class="col-auto">
-        <select id="categoryFilter" name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="">すべて</option>
-            {% for cat in categories %}
-                <option value="{{ cat['category_id'] }}"
-                    {% if selected_category_id == cat['category_id'] %}selected{% endif %}>
-                    {{ cat['name'] }}
-                </option>
-            {% endfor %}
+
+    <!-- 下段：クイック入出庫フォーム -->
+    <form method="post"
+          action="{{ url_for('quick_movement') }}"
+          class="d-flex flex-wrap gap-1 align-items-center">
+        <input type="hidden" name="item_id" value="{{ item['item_id'] }}">
+
+        <select name="movement_type"
+                class="form-select form-select-sm w-auto">
+            <option value="IN">入庫</option>
+            <option value="OUT">出庫</option>
         </select>
-    </div>
-    <noscript>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-sm btn-outline-secondary">絞り込む</button>
-        </div>
-    </noscript>
-</form>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover table-sm align-middle">
-        <thead class="table-light">
-            <tr>
-                <th scope="col">No.</th>
-                <th scope="col">ID</th>
-                <th scope="col">商品名</th>
-                <th scope="col">SKU</th>
-                <th scope="col">カテゴリ</th>
-                <th scope="col">標準価格</th>
-                <th scope="col">サイズ</th>
-                <th scope="col">色</th>
-                <th scope="col">素材</th>
-                <th scope="col">有効</th>
-                <th scope="col">在庫数</th>
-                <th scope="col">操作</th>
-            </tr>
-        </thead>
+        <input type="number"
+               name="quantity"
+               min="1"
+               class="form-control form-control-sm"
+               style="width: 80px;"
+               placeholder="数" required>
 
-        <tbody>
-            {% for item in items %}
-            {% set is_low_stock = item["stock_quantity"] <= low_stock_threshold %}
+        <input type="text"
+               name="memo"
+               class="form-control form-control-sm"
+               style="width: 120px;"
+               placeholder="メモ">
 
-            <tr class="{% if is_low_stock %}low-stock-row{% endif %}">
-                <!-- No. -->
-                <td>{{ loop.index }}</td>
-                <!-- ID -->
-                <td>{{ item["item_id"] }}</td>
-                <!-- 商品情報 -->
-                <td>{{ item["name"] }}</td>
-                <td>{{ item["sku"] }}</td>
-                <td>{{ item["category_name"] or "" }}</td>
-                <td>{{ item["base_price"] }}</td>
-                <td>{{ item["size"] }}</td>
-                <td>{{ item["color"] }}</td>
-                <td>{{ item["material"] }}</td>
-                <!-- 有効 -->
-                <td>{{ "○" if item["is_active"] == 1 else "×" }}</td>
-                <!-- 在庫数（アラート付き） -->
-                <td class="{% if is_low_stock %}low-stock-cell{% endif %}">
-                    {% if is_low_stock %}⚠ {% endif %}
-                    {{ item["stock_quantity"] }}
-                </td>
-                <!-- 操作 -->
-                <td>
-    <a href="{{ url_for('item_history', item_id=item['item_id']) }}"
-       class="btn btn-sm btn-outline-info mb-1">
-        履歴
-    </a>
-    <a href="{{ url_for('edit_item', item_id=item['item_id']) }}"
-       class="btn btn-sm btn-outline-secondary mb-1">
-        編集
-    </a>
-
-    {% if session.get('role') == 'admin' %}
-    <form action="{{ url_for('delete_item', item_id=item['item_id']) }}"
-          method="post" class="d-inline"
-          onsubmit="return confirm('本当に削除しますか？');">
-        <button type="submit" class="btn btn-sm btn-outline-danger mb-1">
-            削除
+        <button type="submit"
+                class="btn btn-sm btn-primary">
+            更新
         </button>
     </form>
-    {% endif %}
 </td>
-
-            </tr>
-            {% else %}
-            <tr>
-                <!-- 列が12個なので colspan も12 -->
-                <td colspan="12" class="text-center text-muted">
-                    まだ商品が登録されていません。
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endblock %}
